@@ -373,7 +373,13 @@ def main():
     output_dir  = cfg["output_dir"]
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",           # necesario en Linux/root/Docker
+                "--disable-dev-shm-usage", # evita crashes en /dev/shm limitado
+            ],
+        )
 
         # ── FASE 1: Construir lista de URLs ───────────────────────
         all_urls = []
