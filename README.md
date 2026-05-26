@@ -22,6 +22,18 @@ Combina una lista de URLs que tú eliges con un **crawler automático** que desc
 
 Python 3.10 o superior y el navegador Chromium de Playwright.
 
+### 🪟 Windows
+
+```bash
+# 1. Instala la librería usando el lanzador 'py'
+py -m pip install playwright
+
+# 2. Descarga los navegadores necesarios (Chromium)
+py -m playwright install chromium
+```
+
+### 🐧 macOS / Linux
+
 ```bash
 pip install -r requirements_screenshots.txt
 playwright install chromium
