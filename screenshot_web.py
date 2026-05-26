@@ -303,6 +303,23 @@ def take_screenshot(page, url: str, filepath: Path) -> bool:
         page.goto(url, wait_until="networkidle", timeout=PAGE_TIMEOUT)
         time.sleep(WAIT_AFTER_LOAD)
 
+        # Fix: forzar fondo blanco en html/body para evitar barra negra
+        # en capturas full_page cuando el fondo de la página es transparente
+        page.evaluate("""
+            () => {
+                const html = document.documentElement;
+                const body = document.body;
+                const bgHtml = window.getComputedStyle(html).backgroundColor;
+                const bgBody = window.getComputedStyle(body).backgroundColor;
+                if (!bgHtml || bgHtml === 'rgba(0, 0, 0, 0)') {
+                    html.style.backgroundColor = '#ffffff';
+                }
+                if (!bgBody || bgBody === 'rgba(0, 0, 0, 0)') {
+                    body.style.backgroundColor = '#ffffff';
+                }
+            }
+        """)
+
         # Scroll suave para activar lazy-loading
         page.evaluate("""
             async () => {
