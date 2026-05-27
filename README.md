@@ -53,7 +53,7 @@ El script te irá preguntando paso a paso:
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║          🖥️   SCREENSHOT MULTI-SHOT  📱                      ║
+║          🖥️   SCREENSHOT MULTI-SHOT  📱                     ║
 ║     Full-page · Desktop · Tablet · Mobile                    ║
 ╚══════════════════════════════════════════════════════════════╝
 
