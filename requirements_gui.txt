@@ -2,3 +2,4 @@ playwright>=1.44.0
 customtkinter>=5.2.0
 Pillow>=10.0.0
 numpy>=1.24.0
+cairosvg>=2.5.0

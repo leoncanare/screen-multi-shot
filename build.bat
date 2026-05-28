@@ -7,7 +7,7 @@ echo ============================================================
 echo.
 
 echo [1/3] Instalando dependencias de build...
-py -m pip install pyinstaller customtkinter playwright Pillow numpy --quiet
+py -m pip install pyinstaller customtkinter playwright Pillow numpy cairosvg --quiet
 if %errorlevel% neq 0 (
     echo.
     echo ERROR: Fallo al instalar dependencias.
@@ -23,6 +23,7 @@ py -m PyInstaller ^
     --name "ScreenshotMultiShot" ^
     --collect-all customtkinter ^
     --collect-all playwright ^
+    --collect-all cairosvg ^
     --add-data "mockups;mockups" ^
     screenshot_gui.py
 
