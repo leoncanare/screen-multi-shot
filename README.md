@@ -1,65 +1,47 @@
 # 📸 Screen Multi-Shot
 
-Herramienta para capturar **screenshots full-page** de toda una web de forma automática, en tres resoluciones distintas: **Desktop**, **Tablet** y **Móvil**.
-
-Combina una lista de URLs que tú eliges con un **crawler automático** que descubre todos los enlaces internos de la web.
+Captura screenshots **full-page** de una web entera en Desktop, Tablet y Mobile. Combina URLs manuales con crawling automático de todos los enlaces internos.
 
 ---
 
-## 🖥️ Versiones disponibles
+## Versiones
 
 | Versión | Archivo | Para quién |
 |---|---|---|
-| **GUI** (recomendada) | `screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
+| **GUI** *(recomendada)* | `screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
 | **CLI** | `screenshot_web.py` | Automatización, scripts |
 
 ---
 
-## ✨ Características
+## Instalación
 
-- 🖥️ **3 resoluciones** — Desktop (1440px), Tablet (768px) y Mobile (390px)
-- 📄 **Full-page** — captura toda la página con scroll, no solo el viewport
-- 🦥 **Lazy-loading** — hace scroll progresivo antes de capturar para cargar imágenes diferidas
-- 🔍 **Auto-crawl** — descubre automáticamente todas las URLs internas de la web
-- 📋 **URLs manuales** — añade rutas específicas que siempre quieres capturar
-- 🎛️ **Profundidades independientes** — configura el nivel de crawl por separado para la URL base y las específicas
-- 💬 **Configuración interactiva** — te pregunta todo antes de arrancar, sin tocar código
-- 📁 **Salida organizada** — carpetas separadas por dispositivo
-
----
-
-## 📦 Requisitos
-
-Python 3.10 o superior y el navegador Chromium de Playwright.
-
-### 🪟 Windows
-
+**Windows**
 ```bash
-# 1. Instala la librería usando el lanzador 'py'
-py -m pip install playwright
-
-# 2. Descarga los navegadores necesarios (Chromium)
+py -m pip install -r requirements_gui.txt
 py -m playwright install chromium
 ```
 
-### 🐧 macOS / Linux
-
+**macOS / Linux**
 ```bash
-pip install -r requirements_screenshots.txt
+pip install -r requirements_gui.txt
 playwright install chromium
 ```
 
+> [!NOTE]
+> La versión GUI instala Chromium automáticamente la primera vez que se ejecuta, sin necesidad de hacerlo manualmente.
+
 ---
 
-## 🚀 Uso
+## Uso
 
-Simplemente ejecuta el script y responde las preguntas:
-
+### GUI
 ```bash
-python screenshot_web.py
+py screenshot_gui.py
 ```
 
-El script te irá preguntando paso a paso:
+Dos pestañas:
+- **📸 Capturar** — configura URL, crawl, dispositivos y lanza la captura
+- **🖼️ Mockups** — inserta los screenshots generados en frames de iPhone, iPad o MacBook
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
@@ -114,147 +96,73 @@ screenshots/
     └── ...
 ```
 
-Cada archivo PNG tiene el nombre de la ruta de la URL. La raíz `/` se guarda como `index.png`.
+El script pregunta todo de forma interactiva antes de arrancar.
 
 ---
 
-## ❓ Preguntas del asistente — detalle
+## Mockups
 
-### 🌐 URL base
-La URL raíz de tu web. Puede ser un dominio real o localhost.
+La pestaña **🖼️ Mockups** detecta automáticamente el área de pantalla de cada frame y compone la imagen final.
 
-| Ejemplo | Válido |
-|---|---|
-| `https://midominio.com` | ✅ |
-| `http://localhost:3000` | ✅ |
-| `midominio.com` | ✅ (añade `https://` automáticamente) |
+> [!IMPORTANT]
+> Coloca los PNG de los dispositivos en la carpeta `mockups/` antes de usar esta función:
+> ```
+> mockups/
+> ├── iphone.png
+> ├── ipad.png
+> └── macbook.png
+> ```
+
+El resultado se guarda en `mockups_output/`, organizado por dispositivo.
 
 ---
 
-### 📋 URLs específicas
-Rutas que **siempre** se capturarán, independientemente del crawl. Escríbelas de una en una. Deja la línea vacía y pulsa **ENTER** para terminar.
-
-Puedes usar rutas relativas o URLs completas:
+## Salida
 
 ```
-/about
-/blog/primer-post
-https://midominio.com/contacto
+screenshots/
+├── desktop/     ← 1440×900 px
+├── tablet/      ← 768×1024 px (retina ×2)
+└── mobile/      ← 390×844 px  (retina ×3)
 ```
 
-> La raíz `/` siempre se incluye automáticamente aunque no la escribas.
+Cada PNG recibe el nombre de la ruta de la URL. La raíz `/` se guarda como `index.png`.
 
 ---
 
-### 🔍 Auto-crawl
-Si lo activas, el script visitará la web empezando por la URL base y seguirá todos los enlaces internos que encuentre, descubriendo páginas automáticamente.
+## Crawl
 
-**Profundidad de crawl:**
+El crawler sigue todos los `<a href>` internos de forma recursiva. La profundidad es configurable e **independiente** para la URL base y para las URLs específicas.
 
-| Valor | Qué visita |
-|---|---|
-| `1` | Solo la raíz y sus enlaces directos |
-| `2` | Raíz → sus enlaces → los enlaces de esos |
-| `3` | Tres niveles de profundidad (recomendado) |
-| `0` | Solo la URL base |
+> [!WARNING]
+> Profundidades altas (4-5) en webs grandes pueden generar cientos de URLs y tardar mucho tiempo.
 
-Las siguientes URLs se **excluyen** siempre del crawl para evitar problemas:
-- Archivos: `.pdf`, `.zip`, `.png`, `.jpg`, `.gif`, `.mp4`, etc.
-- `mailto:`, `tel:`, `javascript:`
-- Anclas (`#`)
-- `/logout`, `/admin`
+URLs excluidas automáticamente: archivos binarios (`.pdf`, `.zip`, imágenes…), `mailto:`, `tel:`, `#`, `/logout`, `/admin`.
 
 ---
 
-### 📱 Dispositivos
-Elige uno o varios separados por coma:
+## Generar .exe
 
-| Opción | Resolución | User-Agent |
-|---|---|---|
-| `1` Desktop | 1440×900 | Chrome en Windows |
-| `2` Tablet | 768×1024 | Safari en iPad |
-| `3` Mobile | 390×844 | Safari en iPhone |
-
-Ejemplo para capturar solo desktop y móvil: `1,3`
-
----
-
-### 📁 Carpeta de salida
-Directorio donde se guardarán los screenshots. Se crea automáticamente si no existe. Por defecto: `screenshots/`.
-
----
-
-## ⚙️ Configuración avanzada
-
-Si quieres cambiar valores por defecto sin responder las preguntas cada vez, edita la sección `CONFIGURACIÓN ESTÁTICA` al inicio del archivo `screenshot_web.py`:
-
-```python
-OUTPUT_DIR     = "screenshots"   # Carpeta por defecto
-WAIT_AFTER_LOAD = 1.5            # Segundos de espera post-carga
-MAX_DEPTH      = 3               # Profundidad de crawl por defecto
-PAGE_TIMEOUT   = 30_000          # Tiempo máximo por página (ms)
+```bash
+build.bat
 ```
 
-Para añadir o quitar patrones de URLs excluidas del crawl, modifica `EXCLUDE_PATTERNS`:
-
-```python
-EXCLUDE_PATTERNS = [
-    r"\.(pdf|zip|png|...)$",
-    r"/mi-ruta-privada",     # ← añade tus exclusiones aquí
-]
-```
+El ejecutable queda en `dist/ScreenshotMultiShot.exe`. Copia la carpeta `mockups/` junto al `.exe` para que funcione la pestaña de mockups.
 
 ---
 
-## 🗂️ Cómo funciona internamente
+## Requisitos
 
-```
-python screenshot_web.py
-        │
-        ▼
-┌─────────────────────┐
-│  1. Preguntas       │  Recoge URL base, rutas manuales,
-│     interactivas    │  dispositivos, profundidad, etc.
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  2. Crawl           │  Visita la web con Playwright y
-│     automático      │  extrae todos los <a href> internos
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  3. Deduplicación   │  Une URLs manuales + crawleadas,
-│     de URLs         │  elimina duplicados
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐   Para cada URL:
-│  4. Screenshots     │   · goto(url, networkidle)
-│     full-page       │   · scroll suave (lazy-load)
-│     × dispositivo   │   · screenshot(full_page=True)
-└────────┬────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  5. Resumen final   │  Muestra éxitos/errores y árbol
-│                     │  de archivos con tamaño en KB
-└─────────────────────┘
-```
-
----
-
-## 📋 Requisitos del sistema
-
-| Requisito | Versión mínima |
+| | Versión mínima |
 |---|---|
 | Python | 3.10+ |
 | playwright | 1.44+ |
-| Chromium | instalado vía `playwright install chromium` |
+| customtkinter | 5.2+ |
+| Pillow | 10.0+ |
+| numpy | 1.24+ |
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 MIT
