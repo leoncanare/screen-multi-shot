@@ -29,6 +29,7 @@ from tkinter import filedialog, messagebox
 from urllib.parse import urljoin, urlparse
 
 import customtkinter as ctk
+import icons as ic
 
 try:
     from PIL import Image
@@ -367,7 +368,7 @@ def mockup_worker(cfg, q, stop_event):
     screenshots_dir = cfg["screenshots_dir"]
     output_dir      = cfg["output_dir"]
     devices         = cfg["devices"]
-    mockups_dir     = get_mockups_dir()
+    mockups_dir     = cfg["mockups_dir"]
 
     # Detectar área de pantalla en cada mockup
     screen_areas = {}
@@ -439,7 +440,7 @@ class ChromiumInstallerDialog(ctk.CTkToplevel):
         self.grab_set(); self.lift(); self.focus_force()
         self.success = False
 
-        ctk.CTkLabel(self, text="🌐 Descargando Chromium",
+        ctk.CTkLabel(self, text="Descargando Chromium",
                      font=ctk.CTkFont(size=18, weight="bold")).pack(pady=(22, 4))
         ctk.CTkLabel(self,
                      text="Chromium es necesario para capturar los screenshots.\n"
@@ -468,8 +469,22 @@ class ChromiumInstallerDialog(ctk.CTkToplevel):
 
     def _run_install(self):
         try:
+            # En un .exe compilado con PyInstaller, sys.executable apunta al propio
+            # .exe, no a Python. Usamos 'py' del PATH para evitar el bucle infinito.
+            if getattr(sys, "frozen", False):
+                import shutil
+                python = shutil.which("py") or shutil.which("python")
+                if not python:
+                    self.after(0, self._append,
+                               "❌ No se encontró Python en el PATH.\n"
+                               "Ejecuta manualmente:\n  py -m playwright install chromium")
+                    self.after(0, self._finish, False)
+                    return
+            else:
+                python = sys.executable
+
             proc = subprocess.Popen(
-                [sys.executable, "-m", "playwright", "install", "chromium"],
+                [python, "-m", "playwright", "install", "chromium"],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, bufsize=1,
             )
@@ -522,7 +537,7 @@ class App(ctk.CTk):
         # Cabecera
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.pack(fill="x", padx=20, pady=(14, 6))
-        ctk.CTkLabel(header, text="🖥️  Screenshot Multi-Shot  📱",
+        ctk.CTkLabel(header, text="Screenshot Multi-Shot",
                      font=ctk.CTkFont(size=21, weight="bold")).pack(side="left")
         ctk.CTkOptionMenu(header, values=["dark", "light", "system"], width=105,
                           command=lambda m: ctk.set_appearance_mode(m)).pack(side="right")
@@ -531,8 +546,8 @@ class App(ctk.CTk):
         self._tabs = ctk.CTkTabview(self)
         self._tabs.pack(fill="both", expand=True, padx=15, pady=(0, 15))
 
-        cap_frame  = self._tabs.add("📸  Capturar")
-        mock_frame = self._tabs.add("🖼️  Mockups")
+        cap_frame  = self._tabs.add("Capturar")
+        mock_frame = self._tabs.add("Mockups")
 
         self._build_capture_tab(cap_frame)
         self._build_mockup_tab(mock_frame)
@@ -570,12 +585,13 @@ class App(ctk.CTk):
         br = ctk.CTkFrame(parent, fg_color="transparent")
         br.pack(fill="x", padx=2, pady=(0, 6))
         self._cap_btn_start = ctk.CTkButton(
-            br, text="🚀  Iniciar captura",
+            br, text="  Iniciar captura", image=ic.get("rocket-launch", 20), compound="left",
             font=ctk.CTkFont(size=15, weight="bold"), height=46,
             command=self._start_capture)
         self._cap_btn_start.pack(side="left", expand=True, fill="x", padx=(0, 6))
         self._cap_btn_cancel = ctk.CTkButton(
-            br, text="⛔  Cancelar", font=ctk.CTkFont(size=15), height=46,
+            br, text="  Cancelar", image=ic.get("x-circle", 20), compound="left",
+            font=ctk.CTkFont(size=15), height=46,
             fg_color="gray30", hover_color="gray20", state="disabled",
             command=self._cancel_capture)
         self._cap_btn_cancel.pack(side="left", expand=True, fill="x", padx=(6, 0))
@@ -584,7 +600,7 @@ class App(ctk.CTk):
         ctk.CTkFrame(parent, height=1, fg_color="gray25").pack(fill="x", pady=10)
 
     def _build_base_section(self, p):
-        ctk.CTkLabel(p, text="🌐  URL Base",
+        ctk.CTkLabel(p, text="  URL Base", image=ic.get("globe-alt", 16), compound="left",
                      font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         self._base_url = ctk.StringVar()
         ctk.CTkEntry(p, placeholder_text="https://midominio.com",
@@ -599,7 +615,7 @@ class App(ctk.CTk):
                           variable=self._depth_base, width=72).pack(side="left")
 
     def _build_specific_section(self, p):
-        ctk.CTkLabel(p, text="📋  URLs Específicas",
+        ctk.CTkLabel(p, text="URLs Específicas",
                      font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         ctk.CTkLabel(p, text="Se capturan siempre, independientemente del crawl.",
                      text_color="gray60", font=ctk.CTkFont(size=12)).pack(anchor="w")
@@ -609,8 +625,8 @@ class App(ctk.CTk):
         self._spec_entry = ctk.CTkEntry(add_row, placeholder_text="/ruta  o  https://...", height=34)
         self._spec_entry.pack(side="left", expand=True, fill="x", padx=(0, 8))
         self._spec_entry.bind("<Return>", lambda _: self._add_spec())
-        ctk.CTkButton(add_row, text="+ Añadir", width=92, height=34,
-                      command=self._add_spec).pack(side="left")
+        ctk.CTkButton(add_row, text=" Añadir", image=ic.get("plus", 14), compound="left",
+                      width=92, height=34, command=self._add_spec).pack(side="left")
 
         self._spec_list_frame = ctk.CTkFrame(p, fg_color="gray17", corner_radius=8)
         self._spec_list_frame.pack(fill="x", pady=(0, 8))
@@ -628,35 +644,37 @@ class App(ctk.CTk):
                           variable=self._depth_specific, width=72).pack(side="left")
 
     def _build_devices_section(self, p):
-        ctk.CTkLabel(p, text="📱  Dispositivos",
-                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(p, text="  Dispositivos", image=ic.get("device-phone-mobile", 16),
+                     compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row = ctk.CTkFrame(p, fg_color="transparent")
         row.pack(fill="x", pady=(8, 0))
         self._dev_desktop = ctk.BooleanVar(value=True)
         self._dev_tablet  = ctk.BooleanVar(value=True)
         self._dev_mobile  = ctk.BooleanVar(value=True)
-        for var, emoji, label, sub in [
-            (self._dev_desktop, "🖥", "Desktop", "1440 × 900"),
-            (self._dev_tablet,  "📟", "Tablet",  "768 × 1024"),
-            (self._dev_mobile,  "📱", "Mobile",  "390 × 844"),
+        _dev_icons = {"Desktop": "computer-desktop", "Tablet": "device-tablet", "Mobile": "device-phone-mobile"}
+        for var, label, sub in [
+            (self._dev_desktop, "Desktop", "1440 × 900"),
+            (self._dev_tablet,  "Tablet",  "768 × 1024"),
+            (self._dev_mobile,  "Mobile",  "390 × 844"),
         ]:
             card = ctk.CTkFrame(row, fg_color="gray17", corner_radius=8)
             card.pack(side="left", expand=True, fill="x", padx=4)
-            ctk.CTkCheckBox(card, text=f"{emoji}  {label}", variable=var,
-                            font=ctk.CTkFont(size=13, weight="bold")).pack(padx=14, pady=(12, 2))
+            ctk.CTkLabel(card, text="", image=ic.get(_dev_icons[label], 22)).pack(pady=(10, 0))
+            ctk.CTkCheckBox(card, text=label, variable=var,
+                            font=ctk.CTkFont(size=13, weight="bold")).pack(padx=14, pady=(4, 2))
             ctk.CTkLabel(card, text=sub, text_color="gray60",
-                         font=ctk.CTkFont(size=11)).pack(padx=14, pady=(0, 12))
+                         font=ctk.CTkFont(size=11)).pack(padx=14, pady=(0, 10))
 
     def _build_output_section(self, p):
-        ctk.CTkLabel(p, text="📁  Carpeta de salida",
-                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(p, text="  Carpeta de salida", image=ic.get("folder", 16),
+                     compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row = ctk.CTkFrame(p, fg_color="transparent")
         row.pack(fill="x", pady=(6, 0))
         self._output_dir = ctk.StringVar(value="screenshots")
         ctk.CTkEntry(row, textvariable=self._output_dir, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
-        ctk.CTkButton(row, text="📂 Explorar", width=105, height=34,
-                      command=self._pick_output).pack(side="left")
+        ctk.CTkButton(row, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
+                      width=105, height=34, command=self._pick_output).pack(side="left")
 
     def _pick_output(self):
         folder = filedialog.askdirectory(title="Carpeta de salida")
@@ -686,7 +704,7 @@ class App(ctk.CTk):
             row = ctk.CTkFrame(self._spec_list_frame, fg_color="transparent")
             row.pack(fill="x", padx=8, pady=2)
             ctk.CTkLabel(row, text=url, anchor="w").pack(side="left", expand=True, fill="x")
-            ctk.CTkButton(row, text="✕", width=28, height=24,
+            ctk.CTkButton(row, text="", image=ic.get("x-mark", 14), width=28, height=24,
                           fg_color="gray30", hover_color="#c0392b",
                           command=lambda u=url: self._remove_spec(u)).pack(side="right")
 
@@ -697,41 +715,61 @@ class App(ctk.CTk):
         scroll.pack(fill="both", expand=True, padx=2, pady=(4, 0))
 
         # Carpeta de screenshots
-        ctk.CTkLabel(scroll, text="📂  Carpeta de screenshots",
+        ctk.CTkLabel(scroll, text="  Carpeta de screenshots",
+                     image=ic.get("folder-open", 16), compound="left",
                      font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row = ctk.CTkFrame(scroll, fg_color="transparent")
         row.pack(fill="x", pady=(4, 8))
         self._mock_src = ctk.StringVar(value="screenshots")
         ctk.CTkEntry(row, textvariable=self._mock_src, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
-        ctk.CTkButton(row, text="📂 Explorar", width=100, height=34,
-                      command=self._pick_mock_src).pack(side="left")
-        ctk.CTkButton(row, text="🔄 Escanear", width=100, height=34,
-                      command=self._scan_mockups, fg_color="gray30",
+        ctk.CTkButton(row, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
+                      width=100, height=34, command=self._pick_mock_src).pack(side="left")
+        ctk.CTkButton(row, text=" Escanear", image=ic.get("arrow-path", 16), compound="left",
+                      width=100, height=34, command=self._scan_mockups, fg_color="gray30",
                       hover_color="gray20").pack(side="left", padx=(8, 0))
+
+        # Carpeta de mockups PNG
+        self._sep(scroll)
+        ctk.CTkLabel(scroll, text="  Carpeta de mockups PNG",
+                     image=ic.get("folder", 16), compound="left",
+                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(scroll,
+                     text="Carpeta que contiene  iphone.png · ipad.png · macbook.png",
+                     text_color="gray60", font=ctk.CTkFont(size=12)).pack(anchor="w")
+        row_m = ctk.CTkFrame(scroll, fg_color="transparent")
+        row_m.pack(fill="x", pady=(4, 0))
+        self._mock_frames_dir = ctk.StringVar(value=str(get_mockups_dir()))
+        ctk.CTkEntry(row_m, textvariable=self._mock_frames_dir, height=34).pack(
+            side="left", expand=True, fill="x", padx=(0, 8))
+        ctk.CTkButton(row_m, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
+                      width=100, height=34, command=self._pick_mock_frames_dir).pack(side="left")
 
         # Tarjetas de dispositivo
         self._sep(scroll)
-        ctk.CTkLabel(scroll, text="🖼️  Dispositivos y mockups",
-                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
-        ctk.CTkLabel(scroll,
-                     text="Coloca los PNG en la carpeta mockups/  →  iphone.png · ipad.png · macbook.png",
-                     text_color="gray60", font=ctk.CTkFont(size=12)).pack(anchor="w")
+        ctk.CTkLabel(scroll, text="  Dispositivos", image=ic.get("device-phone-mobile", 16),
+                     compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
 
         cards = ctk.CTkFrame(scroll, fg_color="transparent")
         cards.pack(fill="x", pady=(8, 0))
 
-        for device, emoji, label, mockup_file in [
-            ("mobile",  "📱", "Mobile",  "iphone.png"),
-            ("tablet",  "📟", "Tablet",  "ipad.png"),
-            ("desktop", "🖥", "Desktop", "macbook.png"),
+        _mock_dev_icons = {
+            "mobile": "device-phone-mobile",
+            "tablet": "device-tablet",
+            "desktop": "computer-desktop",
+        }
+        for device, label, mockup_file in [
+            ("mobile",  "Mobile",  "iphone.png"),
+            ("tablet",  "Tablet",  "ipad.png"),
+            ("desktop", "Desktop", "macbook.png"),
         ]:
             card = ctk.CTkFrame(cards, fg_color="gray17", corner_radius=8)
             card.pack(side="left", expand=True, fill="x", padx=4)
 
             var = ctk.BooleanVar(value=True)
-            ctk.CTkCheckBox(card, text=f"{emoji}  {label}", variable=var,
-                            font=ctk.CTkFont(size=13, weight="bold")).pack(padx=14, pady=(12, 4))
+            ctk.CTkLabel(card, text="", image=ic.get(_mock_dev_icons[device], 22)).pack(pady=(10, 0))
+            ctk.CTkCheckBox(card, text=label, variable=var,
+                            font=ctk.CTkFont(size=13, weight="bold")).pack(padx=14, pady=(4, 4))
 
             shots_lbl = ctk.CTkLabel(card, text="—", text_color="gray50",
                                       font=ctk.CTkFont(size=11))
@@ -748,15 +786,15 @@ class App(ctk.CTk):
 
         # Carpeta de salida
         self._sep(scroll)
-        ctk.CTkLabel(scroll, text="📁  Carpeta de salida",
-                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(scroll, text="  Carpeta de salida", image=ic.get("folder", 16),
+                     compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row2 = ctk.CTkFrame(scroll, fg_color="transparent")
         row2.pack(fill="x", pady=(4, 0))
         self._mock_out = ctk.StringVar(value="mockups_output")
         ctk.CTkEntry(row2, textvariable=self._mock_out, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
-        ctk.CTkButton(row2, text="📂 Explorar", width=100, height=34,
-                      command=self._pick_mock_out).pack(side="left")
+        ctk.CTkButton(row2, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
+                      width=100, height=34, command=self._pick_mock_out).pack(side="left")
 
         # Progreso
         pf = ctk.CTkFrame(parent, fg_color="transparent")
@@ -777,12 +815,13 @@ class App(ctk.CTk):
         br = ctk.CTkFrame(parent, fg_color="transparent")
         br.pack(fill="x", padx=2, pady=(0, 6))
         self._mock_btn_start = ctk.CTkButton(
-            br, text="🎨  Generar Mockups",
+            br, text="  Generar Mockups", image=ic.get("sparkles", 20), compound="left",
             font=ctk.CTkFont(size=15, weight="bold"), height=46,
             command=self._start_mockups)
         self._mock_btn_start.pack(side="left", expand=True, fill="x", padx=(0, 6))
         self._mock_btn_cancel = ctk.CTkButton(
-            br, text="⛔  Cancelar", font=ctk.CTkFont(size=15), height=46,
+            br, text="  Cancelar", image=ic.get("x-circle", 20), compound="left",
+            font=ctk.CTkFont(size=15), height=46,
             fg_color="gray30", hover_color="gray20", state="disabled",
             command=self._cancel_mockups)
         self._mock_btn_cancel.pack(side="left", expand=True, fill="x", padx=(6, 0))
@@ -795,6 +834,12 @@ class App(ctk.CTk):
             self._mock_src.set(folder)
             self._scan_mockups()
 
+    def _pick_mock_frames_dir(self):
+        folder = filedialog.askdirectory(title="Carpeta con los PNG de mockups")
+        if folder:
+            self._mock_frames_dir.set(folder)
+            self._scan_mockups()
+
     def _pick_mock_out(self):
         folder = filedialog.askdirectory(title="Carpeta de salida para mockups")
         if folder:
@@ -802,7 +847,7 @@ class App(ctk.CTk):
 
     def _scan_mockups(self):
         src         = Path(self._mock_src.get())
-        mockups_dir = get_mockups_dir()
+        mockups_dir = Path(self._mock_frames_dir.get())
         for device, info in self._mock_dev_info.items():
             # Contar screenshots disponibles
             folder = src / device
@@ -939,6 +984,7 @@ class App(ctk.CTk):
 
         cfg = {
             "screenshots_dir": Path(self._mock_src.get()),
+            "mockups_dir":     Path(self._mock_frames_dir.get()),
             "devices":         devices,
             "output_dir":      Path(self._mock_out.get() or "mockups_output"),
         }
