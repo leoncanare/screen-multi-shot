@@ -88,6 +88,13 @@ MOCKUP_CONFIG = {
 }
 
 
+def get_base_dir() -> Path:
+    """Carpeta del .exe (frozen) o del script (desarrollo)."""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).parent
+    return Path(__file__).parent
+
+
 def get_mockups_dir() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "mockups"
@@ -670,7 +677,7 @@ class App(ctk.CTk):
                      compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row = ctk.CTkFrame(p, fg_color="transparent")
         row.pack(fill="x", pady=(6, 0))
-        self._output_dir = ctk.StringVar(value="screenshots")
+        self._output_dir = ctk.StringVar(value=str(get_base_dir() / "screenshots"))
         ctk.CTkEntry(row, textvariable=self._output_dir, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
         ctk.CTkButton(row, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
@@ -720,7 +727,7 @@ class App(ctk.CTk):
                      font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row = ctk.CTkFrame(scroll, fg_color="transparent")
         row.pack(fill="x", pady=(4, 8))
-        self._mock_src = ctk.StringVar(value="screenshots")
+        self._mock_src = ctk.StringVar(value=str(get_base_dir() / "screenshots"))
         ctk.CTkEntry(row, textvariable=self._mock_src, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
         ctk.CTkButton(row, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
@@ -790,7 +797,7 @@ class App(ctk.CTk):
                      compound="left", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         row2 = ctk.CTkFrame(scroll, fg_color="transparent")
         row2.pack(fill="x", pady=(4, 0))
-        self._mock_out = ctk.StringVar(value="mockups_output")
+        self._mock_out = ctk.StringVar(value=str(get_base_dir() / "mockups_output"))
         ctk.CTkEntry(row2, textvariable=self._mock_out, height=34).pack(
             side="left", expand=True, fill="x", padx=(0, 8))
         ctk.CTkButton(row2, text=" Explorar", image=ic.get("folder-open", 16), compound="left",
