@@ -468,8 +468,22 @@ class ChromiumInstallerDialog(ctk.CTkToplevel):
 
     def _run_install(self):
         try:
+            # En un .exe compilado con PyInstaller, sys.executable apunta al propio
+            # .exe, no a Python. Usamos 'py' del PATH para evitar el bucle infinito.
+            if getattr(sys, "frozen", False):
+                import shutil
+                python = shutil.which("py") or shutil.which("python")
+                if not python:
+                    self.after(0, self._append,
+                               "❌ No se encontró Python en el PATH.\n"
+                               "Ejecuta manualmente:\n  py -m playwright install chromium")
+                    self.after(0, self._finish, False)
+                    return
+            else:
+                python = sys.executable
+
             proc = subprocess.Popen(
-                [sys.executable, "-m", "playwright", "install", "chromium"],
+                [python, "-m", "playwright", "install", "chromium"],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, bufsize=1,
             )
