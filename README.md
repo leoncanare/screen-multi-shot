@@ -6,6 +6,15 @@ Combina una lista de URLs que tú eliges con un **crawler automático** que desc
 
 ---
 
+## 🖥️ Versiones disponibles
+
+| Versión | Archivo | Para quién |
+|---|---|---|
+| **GUI** (recomendada) | `screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
+| **CLI** | `screenshot_web.py` | Automatización, scripts |
+
+---
+
 ## ✨ Características
 
 - 🖥️ **3 resoluciones** — Desktop (1440px), Tablet (768px) y Mobile (390px)
@@ -13,6 +22,7 @@ Combina una lista de URLs que tú eliges con un **crawler automático** que desc
 - 🦥 **Lazy-loading** — hace scroll progresivo antes de capturar para cargar imágenes diferidas
 - 🔍 **Auto-crawl** — descubre automáticamente todas las URLs internas de la web
 - 📋 **URLs manuales** — añade rutas específicas que siempre quieres capturar
+- 🎛️ **Profundidades independientes** — configura el nivel de crawl por separado para la URL base y las específicas
 - 💬 **Configuración interactiva** — te pregunta todo antes de arrancar, sin tocar código
 - 📁 **Salida organizada** — carpetas separadas por dispositivo
 
