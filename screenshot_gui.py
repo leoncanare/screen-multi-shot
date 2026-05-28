@@ -96,9 +96,7 @@ def get_base_dir() -> Path:
 
 
 def get_mockups_dir() -> Path:
-    if getattr(sys, "frozen", False):
-        return Path(sys._MEIPASS) / "mockups"
-    return Path(__file__).parent / "mockups"
+    return get_base_dir() / "mockups"
 
 
 # ─────────────────────────────────────────────────────────────────
