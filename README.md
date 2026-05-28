@@ -43,9 +43,57 @@ Dos pestañas:
 - **📸 Capturar** — configura URL, crawl, dispositivos y lanza la captura
 - **🖼️ Mockups** — inserta los screenshots generados en frames de iPhone, iPad o MacBook
 
-### CLI
-```bash
-py screenshot_web.py
+```
+╔══════════════════════════════════════════════════════════════╗
+║          🖥️   SCREENSHOT MULTI-SHOT  📱                     ║
+║     Full-page · Desktop · Tablet · Mobile                    ║
+╚══════════════════════════════════════════════════════════════╝
+
+  🌐 URL base de tu web (ej: https://midominio.com): https://midominio.com
+
+  📋 URL específica #1 (ENTER para terminar): /about
+  📋 URL específica #2 (ENTER para terminar): /contacto
+  📋 URL específica #3 (ENTER para terminar):   ← ENTER vacío para terminar
+
+  🔍 ¿Activar auto-crawl para descubrir todas las URLs internas? [S/n]: s
+     Profundidad máxima de crawl [3]: 2
+
+  📱 Dispositivos a capturar:
+     1) Desktop  (1440×900)
+     2) Tablet   (768×1024)
+     3) Mobile   (390×844)
+  Selección [1,2,3]: 1,3
+
+  📁 Carpeta de salida [screenshots]:
+
+  📝 RESUMEN DE CONFIGURACIÓN
+  ────────────────────────────────────────────────────────────────
+  URL base         : https://midominio.com
+  URLs específicas : ['/about', '/contacto']
+  Auto-crawl       : Sí (profundidad 2)
+  Dispositivos     : desktop, mobile
+  Carpeta salida   : screenshots
+  ────────────────────────────────────────────────────────────────
+
+  ¿Todo correcto? ¿Arrancamos? [S/n]: s
+```
+
+---
+
+## 📂 Estructura de salida
+
+```
+screenshots/
+├── desktop/               ← 1440×900 px
+│   ├── index.png
+│   ├── about.png
+│   └── contacto.png
+├── tablet/                ← 768×1024 px (retina ×2)
+│   ├── index.png
+│   └── ...
+└── mobile/                ← 390×844 px (retina ×3)
+    ├── index.png
+    └── ...
 ```
 
 El script pregunta todo de forma interactiva antes de arrancar.
