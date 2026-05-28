@@ -7,7 +7,7 @@ echo ============================================================
 echo.
 
 echo [1/3] Instalando dependencias de build...
-py -m pip install pyinstaller customtkinter playwright --quiet
+py -m pip install pyinstaller customtkinter playwright Pillow numpy --quiet
 if %errorlevel% neq 0 (
     echo.
     echo ERROR: Fallo al instalar dependencias.
@@ -22,6 +22,7 @@ py -m PyInstaller ^
     --windowed ^
     --name "ScreenshotMultiShot" ^
     --collect-all customtkinter ^
+    --add-data "mockups;mockups" ^
     screenshot_gui.py
 
 if %errorlevel% neq 0 (
@@ -36,7 +37,12 @@ echo [3/3] Listo!
 echo.
 echo  Ejecutable generado en: dist\ScreenshotMultiShot.exe
 echo.
-echo  NOTA: La primera vez que se ejecute el .exe,
+echo  IMPORTANTE: la primera vez que se ejecute el .exe,
 echo  descargara Chromium automaticamente (~150 MB).
+echo.
+echo  Los mockups van en la misma carpeta que el .exe:
+echo    dist\mockups\iphone.png
+echo    dist\mockups\ipad.png
+echo    dist\mockups\macbook.png
 echo.
 pause
