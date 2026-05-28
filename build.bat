@@ -23,7 +23,6 @@ py -m PyInstaller ^
     --name "ScreenshotMultiShot" ^
     --collect-all customtkinter ^
     --collect-all playwright ^
-    --collect-all cairosvg ^
     --add-data "mockups;mockups" ^
     screenshot_gui.py
 
