@@ -7,7 +7,7 @@ echo ============================================================
 echo.
 
 echo [1/3] Instalando dependencias de build...
-py -m pip install pyinstaller customtkinter playwright Pillow numpy cairosvg --quiet
+py -m pip install pyinstaller -r requirements.txt --quiet
 if %errorlevel% neq 0 (
     echo.
     echo ERROR: Fallo al instalar dependencias.

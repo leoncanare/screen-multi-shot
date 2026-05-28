@@ -17,13 +17,13 @@ Captura screenshots **full-page** de una web entera en Desktop, Tablet y Mobile.
 
 **Windows**
 ```bash
-py -m pip install -r requirements_gui.txt
+py -m pip install -r requirements.txt
 py -m playwright install chromium
 ```
 
 **macOS / Linux**
 ```bash
-pip install -r requirements_gui.txt
+pip install -r requirements.txt
 playwright install chromium
 ```
 
@@ -160,6 +160,7 @@ El ejecutable queda en `dist/ScreenshotMultiShot.exe`. Copia la carpeta `mockups
 | customtkinter | 5.2+ |
 | Pillow | 10.0+ |
 | numpy | 1.24+ |
+| cairosvg | 2.5+ |
 
 ---
 
