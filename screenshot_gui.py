@@ -367,7 +367,7 @@ def mockup_worker(cfg, q, stop_event):
     screenshots_dir = cfg["screenshots_dir"]
     output_dir      = cfg["output_dir"]
     devices         = cfg["devices"]
-    mockups_dir     = get_mockups_dir()
+    mockups_dir     = cfg["mockups_dir"]
 
     # Detectar área de pantalla en cada mockup
     screen_areas = {}
@@ -724,13 +724,25 @@ class App(ctk.CTk):
                       command=self._scan_mockups, fg_color="gray30",
                       hover_color="gray20").pack(side="left", padx=(8, 0))
 
-        # Tarjetas de dispositivo
+        # Carpeta de mockups PNG
         self._sep(scroll)
-        ctk.CTkLabel(scroll, text="🖼️  Dispositivos y mockups",
+        ctk.CTkLabel(scroll, text="🖼️  Carpeta de mockups PNG",
                      font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
         ctk.CTkLabel(scroll,
-                     text="Coloca los PNG en la carpeta mockups/  →  iphone.png · ipad.png · macbook.png",
+                     text="Carpeta que contiene  iphone.png · ipad.png · macbook.png",
                      text_color="gray60", font=ctk.CTkFont(size=12)).pack(anchor="w")
+        row_m = ctk.CTkFrame(scroll, fg_color="transparent")
+        row_m.pack(fill="x", pady=(4, 0))
+        self._mock_frames_dir = ctk.StringVar(value=str(get_mockups_dir()))
+        ctk.CTkEntry(row_m, textvariable=self._mock_frames_dir, height=34).pack(
+            side="left", expand=True, fill="x", padx=(0, 8))
+        ctk.CTkButton(row_m, text="📂 Explorar", width=100, height=34,
+                      command=self._pick_mock_frames_dir).pack(side="left")
+
+        # Tarjetas de dispositivo
+        self._sep(scroll)
+        ctk.CTkLabel(scroll, text="📱  Dispositivos",
+                     font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w")
 
         cards = ctk.CTkFrame(scroll, fg_color="transparent")
         cards.pack(fill="x", pady=(8, 0))
@@ -809,6 +821,12 @@ class App(ctk.CTk):
             self._mock_src.set(folder)
             self._scan_mockups()
 
+    def _pick_mock_frames_dir(self):
+        folder = filedialog.askdirectory(title="Carpeta con los PNG de mockups")
+        if folder:
+            self._mock_frames_dir.set(folder)
+            self._scan_mockups()
+
     def _pick_mock_out(self):
         folder = filedialog.askdirectory(title="Carpeta de salida para mockups")
         if folder:
@@ -816,7 +834,7 @@ class App(ctk.CTk):
 
     def _scan_mockups(self):
         src         = Path(self._mock_src.get())
-        mockups_dir = get_mockups_dir()
+        mockups_dir = Path(self._mock_frames_dir.get())
         for device, info in self._mock_dev_info.items():
             # Contar screenshots disponibles
             folder = src / device
@@ -953,6 +971,7 @@ class App(ctk.CTk):
 
         cfg = {
             "screenshots_dir": Path(self._mock_src.get()),
+            "mockups_dir":     Path(self._mock_frames_dir.get()),
             "devices":         devices,
             "output_dir":      Path(self._mock_out.get() or "mockups_output"),
         }
