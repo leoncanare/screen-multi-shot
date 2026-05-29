@@ -4,27 +4,50 @@ Captura screenshots **full-page** de una web entera en Desktop, Tablet y Mobile.
 
 ---
 
-## Versiones
+## Descarga rápida (Windows)
 
-| Versión | Archivo | Para quién |
-|---|---|---|
-| **GUI** *(recomendada)* | `src/screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
-| **CLI** | `src/screenshot_web.py` | Automatización, scripts |
+> [!TIP]
+> Sin Python, sin instalación. Descarga la carpeta `dist/` del repositorio y ejecuta directamente el `.exe`.
+
+```
+dist/
+├── ScreenshotMultiShot.exe   ← ejecutar esto
+└── mockups/
+    ├── iphone.png
+    ├── ipad.png
+    └── macbook.png
+```
+
+La primera vez que se abra descargará Chromium automáticamente (~150 MB).
 
 ---
 
-## Instalación
+## Versiones
+
+| Versión                 | Archivo                        | Para quién                 |
+| ----------------------- | ------------------------------ | -------------------------- |
+| **GUI** _(recomendada)_ | `dist/ScreenshotMultiShot.exe` | Uso diario, sin terminal   |
+| **Script**              | `screenshot_gui.py`            | Desarrollo / macOS / Linux |
+| **CLI**                 | `screenshot_web.py`            | Automatización, scripts    |
+
+---
+
+## Instalación desde código fuente
 
 **Windows**
+
 ```bash
 py -m pip install -r requirements.txt
 py -m playwright install chromium
+py screenshot_gui.py
 ```
 
 **macOS / Linux**
+
 ```bash
 pip install -r requirements.txt
 playwright install chromium
+python screenshot_gui.py
 ```
 
 > [!NOTE]
@@ -34,90 +57,12 @@ playwright install chromium
 
 ## Uso
 
-### GUI
-```bash
-py src/screenshot_gui.py
-```
-
 Dos pestañas:
-- **📸 Capturar** — configura URL, crawl, dispositivos y lanza la captura
-- **🖼️ Mockups** — inserta los screenshots generados en frames de iPhone, iPad o MacBook
 
-```
-╔══════════════════════════════════════════════════════════════╗
-║          🖥️   SCREENSHOT MULTI-SHOT  📱                     ║
-║     Full-page · Desktop · Tablet · Mobile                    ║
-╚══════════════════════════════════════════════════════════════╝
+- **Capturar** — configura URL, crawl, dispositivos y lanza la captura
+- **Mockups** — inserta los screenshots generados en frames de iPhone, iPad o MacBook
 
-  🌐 URL base de tu web (ej: https://midominio.com): https://midominio.com
-
-  📋 URL específica #1 (ENTER para terminar): /about
-  📋 URL específica #2 (ENTER para terminar): /contacto
-  📋 URL específica #3 (ENTER para terminar):   ← ENTER vacío para terminar
-
-  🔍 ¿Activar auto-crawl para descubrir todas las URLs internas? [S/n]: s
-     Profundidad máxima de crawl [3]: 2
-
-  📱 Dispositivos a capturar:
-     1) Desktop  (1440×900)
-     2) Tablet   (768×1024)
-     3) Mobile   (390×844)
-  Selección [1,2,3]: 1,3
-
-  📁 Carpeta de salida [screenshots]:
-
-  📝 RESUMEN DE CONFIGURACIÓN
-  ────────────────────────────────────────────────────────────────
-  URL base         : https://midominio.com
-  URLs específicas : ['/about', '/contacto']
-  Auto-crawl       : Sí (profundidad 2)
-  Dispositivos     : desktop, mobile
-  Carpeta salida   : screenshots
-  ────────────────────────────────────────────────────────────────
-
-  ¿Todo correcto? ¿Arrancamos? [S/n]: s
-```
-
----
-
-## 📂 Estructura de salida
-
-```
-screenshots/
-├── desktop/               ← 1440×900 px
-│   ├── index.png
-│   ├── about.png
-│   └── contacto.png
-├── tablet/                ← 768×1024 px (retina ×2)
-│   ├── index.png
-│   └── ...
-└── mobile/                ← 390×844 px (retina ×3)
-    ├── index.png
-    └── ...
-```
-
-El script pregunta todo de forma interactiva antes de arrancar.
-
----
-
-## Mockups
-
-La pestaña **🖼️ Mockups** detecta automáticamente el área de pantalla de cada frame y compone la imagen final.
-
-> [!IMPORTANT]
-> Coloca los PNG de los dispositivos en la carpeta `dist/mockups/` antes de usar esta función:
-> ```
-> dist/mockups/
-> ├── iphone.png
-> ├── ipad.png
-> └── macbook.png
-> ```
-
-El resultado se guarda en `mockups_output/`, organizado por dispositivo.
-
----
-
-## Salida
+### Estructura de salida
 
 ```
 screenshots/
@@ -127,6 +72,24 @@ screenshots/
 ```
 
 Cada PNG recibe el nombre de la ruta de la URL. La raíz `/` se guarda como `index.png`.
+
+---
+
+## Mockups
+
+La pestaña **Mockups** detecta automáticamente el área de pantalla de cada frame y compone la imagen final.
+
+> [!IMPORTANT]
+> Los PNG de los dispositivos deben estar en la carpeta `mockups/` junto al `.exe` (ya incluida en `dist/`):
+>
+> ```
+> dist/mockups/
+> ├── iphone.png
+> ├── ipad.png
+> └── macbook.png
+> ```
+
+El resultado se guarda en `mockups_output/`, organizado por dispositivo.
 
 ---
 
@@ -141,26 +104,25 @@ URLs excluidas automáticamente: archivos binarios (`.pdf`, `.zip`, imágenes…
 
 ---
 
-## Generar .exe
+## Generar .exe (desarrollo)
 
 ```bash
 scripts\build.bat
 ```
 
-El ejecutable queda en `dist/ScreenshotMultiShot.exe`. Los mockups van en `dist/mockups/` junto al `.exe`.
+El ejecutable queda en `dist/ScreenshotMultiShot.exe`.
 
 ---
 
-## Requisitos
+## Requisitos (script)
 
-| | Versión mínima |
-|---|---|
-| Python | 3.10+ |
-| playwright | 1.44+ |
-| customtkinter | 5.2+ |
-| Pillow | 10.0+ |
-| numpy | 1.24+ |
-| cairosvg | 2.5+ |
+|               | Versión mínima |
+| ------------- | -------------- |
+| Python        | 3.10+          |
+| playwright    | 1.44+          |
+| customtkinter | 5.2+           |
+| Pillow        | 10.0+          |
+| numpy         | 1.24+          |
 
 ---
 
