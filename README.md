@@ -8,8 +8,8 @@ Captura screenshots **full-page** de una web entera en Desktop, Tablet y Mobile.
 
 | Versión | Archivo | Para quién |
 |---|---|---|
-| **GUI** *(recomendada)* | `screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
-| **CLI** | `screenshot_web.py` | Automatización, scripts |
+| **GUI** *(recomendada)* | `src/screenshot_gui.py` / `ScreenshotMultiShot.exe` | Uso diario, sin terminal |
+| **CLI** | `src/screenshot_web.py` | Automatización, scripts |
 
 ---
 
@@ -36,7 +36,7 @@ playwright install chromium
 
 ### GUI
 ```bash
-py screenshot_gui.py
+py src/screenshot_gui.py
 ```
 
 Dos pestañas:
@@ -105,9 +105,9 @@ El script pregunta todo de forma interactiva antes de arrancar.
 La pestaña **🖼️ Mockups** detecta automáticamente el área de pantalla de cada frame y compone la imagen final.
 
 > [!IMPORTANT]
-> Coloca los PNG de los dispositivos en la carpeta `mockups/` antes de usar esta función:
+> Coloca los PNG de los dispositivos en la carpeta `dist/mockups/` antes de usar esta función:
 > ```
-> mockups/
+> dist/mockups/
 > ├── iphone.png
 > ├── ipad.png
 > └── macbook.png
@@ -144,10 +144,10 @@ URLs excluidas automáticamente: archivos binarios (`.pdf`, `.zip`, imágenes…
 ## Generar .exe
 
 ```bash
-build.bat
+scripts\build.bat
 ```
 
-El ejecutable queda en `dist/ScreenshotMultiShot.exe`. Copia la carpeta `mockups/` junto al `.exe` para que funcione la pestaña de mockups.
+El ejecutable queda en `dist/ScreenshotMultiShot.exe`. Los mockups van en `dist/mockups/` junto al `.exe`.
 
 ---
 

@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0\.."
 title Screenshot Multi-Shot — Build .exe
 echo.
 echo ============================================================
@@ -23,8 +24,8 @@ py -m PyInstaller ^
     --name "ScreenshotMultiShot" ^
     --collect-all customtkinter ^
     --collect-all playwright ^
-    --add-data "mockups;mockups" ^
-    screenshot_gui.py
+    --add-data "dist\mockups;mockups" ^
+    src\screenshot_gui.py
 
 if %errorlevel% neq 0 (
     echo.

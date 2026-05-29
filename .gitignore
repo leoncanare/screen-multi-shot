@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 *.pyo
-build/
 *.spec
 screenshots/
 mockups_output/

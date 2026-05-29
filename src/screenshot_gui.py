@@ -9,12 +9,12 @@ Dependencias:
     py -m pip install playwright customtkinter Pillow numpy
 
 Generar .exe:
-    build.bat
+    scripts\build.bat
 
-Mockups (colocar en carpeta mockups/):
-    mockups/iphone.png
-    mockups/ipad.png
-    mockups/macbook.png
+Mockups (colocar en carpeta dist/mockups/):
+    dist/mockups/iphone.png
+    dist/mockups/ipad.png
+    dist/mockups/macbook.png
 """
 
 import queue
@@ -96,7 +96,9 @@ def get_base_dir() -> Path:
 
 
 def get_mockups_dir() -> Path:
-    return get_base_dir() / "mockups"
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).parent / "mockups"
+    return Path(__file__).parent.parent / "dist" / "mockups"
 
 
 # ─────────────────────────────────────────────────────────────────
